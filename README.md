@@ -90,7 +90,7 @@ Based on the obtained FSG, we train the entropy-based clustering model.
   python Entropy_based_cluster/GREClue_code.py
   ```
 ### RQ3 Impact Analysis
-In the ablation experiment, four submodules are gradually deleted: (1) GREClue-Suspicion_List, (2) GREClue-K-medoids, and (3) GREClue-RMALL.
+In the ablation experiment, three submodules are gradually deleted: (1) GREClue-Suspicion_List, (2) GREClue-K-medoids, and (3) GREClue-RMALL.
 * (1)GREClue-Suspicion_List: We replace GREClue with GREClue-Suspicion_List, which only inputs the sequence features of suspiciousness ranking lists into the entropy-based deep clustering model.
   Please replace the "build_items_from_raw" method in "Entropy-Based cluster/GREClue_code.py" with the following:
 ```
