@@ -10,11 +10,11 @@ from tree_sitter import Parser
 LOC_RE = re.compile(
     r"""
     ^
-    (?P<pkg>[A-Za-z_][\w\.]*)      # org.apache.commons.lang3.time
+    (?P<pkg>[A-Za-z_][\w\.]*)     
     \$
-    (?P<filebase>[A-Za-z_]\w*)     # FormatCache
+    (?P<filebase>[A-Za-z_]\w*)    
     \#
-    (?P<func>[A-Za-z_]\w*)         # FormatCache（C 函数名）
+    (?P<func>[A-Za-z_]\w*)         
     \(\)
     :
     (?P<line>\d+)
