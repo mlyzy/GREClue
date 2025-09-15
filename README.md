@@ -10,11 +10,10 @@ Based on the FSG, GREClue further consists of an entropy-based deep clustering c
 ## Folder Structure
 Here we list the descriptions of the folders.
 ```
- ├── Dataset: data used to train and test
  ├── FSG: the code of FSG
      ├──FSG/Defects4J-Multifault: the code of generating Failure Semantic Graphs for a Java programs in Defects4J-Multifault
      ├──FSG/SIR: the code of generating Failure Semantic Graphs for a C programs in SIR
- ├── Entropy_based_cluster: the code of Entropy-based cluster
+ ├── Entropy_based_clustering: the code of Entropy-based cluster
  ├── K-medoids: the code of K-medoids
 ```
 ## Requirements
@@ -136,7 +135,7 @@ We simulate the parallel debugging process based on the results of the failure i
 
 (1) cluster the failing tests according to the results of the failure indexing approaches.
   ```
-  python Entropy_based_cluster/GREClue_code.py
+  python Entropy_based_clustering/GREClue_code.py
   ```
 (2) each cluster of failed tests and all passed tests form the corresponding test suite.
 
