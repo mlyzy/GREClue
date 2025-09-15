@@ -14,7 +14,7 @@ Our code is written based on the Peft package. Here we only describe the files r
  ├── FSG: the code of FSG
      ├──FSG/Defects4J-Multifault: the code of generating Failure Semantic Graphs for a Java programs in Defects4J-Multifault
      ├──FSG/SIR: the code of generating Failure Semantic Graphs for a C programs in SIR
- ├── Entropy-based cluster: the code of Entropy-based cluster
+ ├── Entropy_based_cluster: the code of Entropy-based cluster
  ├── K-medoids: the code of K-medoids
 ```
 ## Requirements
@@ -87,7 +87,7 @@ python /FSG/SIR/step4.py   --method_graph /path/to/method_graph.txt   --codeline
  ```
 Based on the obtained FSG, we train the entropy-based clustering model.
   ```
-  python Entropy-based_cluster/GREClue_code.py
+  python Entropy_based_cluster/GREClue_code.py
   ```
 ### RQ3 Impact Analysis
 In the ablation experiment, four submodules are gradually deleted: (1) GREClue-Suspicion_List, (2) GREClue-K-medoids, and (3) GREClue-RMALL.
@@ -131,7 +131,7 @@ def build_items_linear(seq_lists: List[List[str]], graphs: List[Dict[str, Any]],
 ### RQ4 Parallel Debugging Effectiveness
 We simulate the parallel debugging process based on the results of the failure indexing approaches.
   ```
-  python Entropy-based_cluster/GREClue_code.py
+  python Entropy_based_cluster/GREClue_code.py
   ```
 (2) each cluster of failed tests and all passed tests form the corresponding test suite. (Manual completion)
 
