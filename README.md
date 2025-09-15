@@ -71,12 +71,14 @@ We studied the impact of different selection ranges of the suspiciousness rankin
   ```
 ### RQ2 Model Effectiveness
 After determining the scope of the suspiciousness ranking list , we need to obtain the FSG of the faulty code.
+We generate FSG for Defects4J-Multifault using the following command:
   ```
 python /FSG/Defects4J-Multifault/step1.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv   --txtout /path/of/result.txt
 python /FSG/Defects4J-Multifault/step2.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv  --txtout /path/of/result.txt
 javac /FSG/Defects4J-Multifault/step3/semanticmodel/Activator.java
 python /FSG/Defects4J-Multifault/step4.py   --method_graph /path/to/method_graph.txt   --codeline_flow /path/to/codeline_flow.txt   --var_dir /path/to/var_dir   --testfile /path/to/testcase.txt   --out /path/to/merged.txt
   ```
+We generate FSG for SIR using the following command:
   ```
 python /FSG/SIR/step1.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv   --txtout /path/of/result.txt
 python /FSG/SIR/step2.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv  --txtout /path/of/result.txt
