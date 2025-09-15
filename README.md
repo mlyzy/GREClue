@@ -136,3 +136,6 @@ We simulate the parallel debugging process based on the results of the failure i
 (3) generate a corresponding suspiciousness ranking list for each test suite.
 
 (4) fix the faulty code for each suspiciousness ranking list in parallel and calculate the parallel debugging cost
+  ```
+python debugging_cost.py   --sus sus.csv   --label label.csv
+  ```
