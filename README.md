@@ -126,14 +126,13 @@ def build_items_linear(seq_lists: List[List[str]], graphs: List[Dict[str, Any]],
   Delete lines 53-57 and 66-68 in /K-medoids/pipeline.py and replace line 69 -> z=s_vec
   ```
 ### RQ4 Parallel Debugging Effectiveness
-We simulate the parallel debugging process based on the results of the failure indexing approaches. Some operations require manual intervention.
-(1) cluster the failing tests according to the results of the failure indexing approaches.
+We simulate the parallel debugging process based on the results of the failure indexing approaches.
   ```
   python Entropy-based_cluster/GREClue_code.py
   ```
-(2) each cluster of failed tests and all passed tests form the corresponding test suite.
+(2) each cluster of failed tests and all passed tests form the corresponding test suite. (Manual completion)
 
-(3) generate a corresponding suspiciousness ranking list for each test suite.
+(3) generate a corresponding suspiciousness ranking list for each test suite. (Refer to RQ1)
 
 (4) fix the faulty code for each suspiciousness ranking list in parallel and calculate the parallel debugging cost
   ```
