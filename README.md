@@ -74,7 +74,7 @@ After determining the scope of the suspiciousness ranking list , we need to obta
   ```
 python /FSG/Defects4J-Multifault/step1.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv   --txtout /path/of/result.txt
 python /FSG/Defects4J-Multifault/step2.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv  --txtout /path/of/result.txt
-javac FSG/semanticmodel/Activator.java
+javac /FSG/Defects4J-Multifault/step3/semanticmodel/Activator.java
 python /FSG/Defects4J-Multifault/step4.py   --method_graph /path/to/method_graph.txt   --codeline_flow /path/to/codeline_flow.txt   --var_dir /path/to/var_dir   --testfile /path/to/testcase.txt   --out /path/to/merged.txt
   ```
   ```
