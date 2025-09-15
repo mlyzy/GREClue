@@ -445,7 +445,7 @@ def parse_graph_file(path: str):
             content, sus = "", 0.0
             mobj = re.search(r"\{(.*)\}", rest)
             if mobj:
-                obj = mobj.group(1).replace("：", ":")  # 兼容中文冒号
+                obj = mobj.group(1).replace("：", ":") 
                 attrs = {}
                 for kv in re.split(r",(?![^{}]*\})", obj):
                     if ":" in kv:
@@ -468,33 +468,30 @@ def parse_graph_file(path: str):
 
     return {"nodes": nodes, "edges": edges}
 
-# === 从多个目录批量加载 ===
+
 def load_failure_groups(data_dirs):
-    """
-    data_dirs: List[str]，每个目录内存在 <id>_list.txt 与 <id>_graph.(txt|json)
-    返回：seq_lists, graphs, labels, sample_ids
-    """
+
     seq_lists, graphs, labels, sample_ids = [], [], [], []
     for root in map(Path, data_dirs):
         if not root.exists():
-            print(f"[WARN] 目录不存在：{root}")
+            print(f"[WARN] error：{root}")
             continue
         list_files = sorted(root.glob("*_list.txt"))
         for lf in list_files:
-            prefix = lf.name[:-9]  # 去掉 '_list.txt'
+            prefix = lf.name[:-9] 
             gf = root / f"{prefix}_graph.txt"
             if not gf.exists():
                 alt = root / f"{prefix}_graph.json"
                 gf = alt if alt.exists() else None
             if gf is None or not gf.exists():
-                print(f"[WARN] 缺少图文件：{lf} -> {prefix}_graph.txt/json 不存在，跳过")
+                print(f"continue")
                 continue
 
             seq = read_seq_list_file(str(lf))
             g   = parse_graph_file(str(gf))
             graphs.append({"global_nodes": g.get("nodes", []), "edges": g.get("edges", [])})
             seq_lists.append(seq)
-            labels.append(-1)  # 无监督时默认 -1
+            labels.append(-1) 
             sample_ids.append(f"{root.name}/{prefix}")
     return seq_lists, graphs, labels, sample_ids
 
@@ -561,16 +558,13 @@ def train_cluster_net():
     parser.add_argument(
     "--data_dirs", nargs="+", required=True)
 
-    # === 解析后：===
     args = parser.parse_args()
     args.train_cluster_net = args.max_epochs
 
-    # === 用文件读取替换假数据 ===
     seq_lists, graphs, labels, sample_ids = load_failure_groups(args.data_dirs)
 
     items = build_items_from_raw(seq_lists, graphs, labels)
 
-    # 你可以在这里做 train/val 切分
     split = max(1, int(len(items) * 0.1))
     traindataset = FailureCaseDataset(items[split:])
     valdataset   = FailureCaseDataset(items[:split])
