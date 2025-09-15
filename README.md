@@ -8,7 +8,7 @@ Based on the FSG, GREClue further consists of an entropy-based deep clustering c
 <div align=center><img src="fig3.png" width = 50% ></div>
 
 ## Folder Structure
-Here we list the descriptions of the folders.
+Here we list the descriptions of the folders:
 ```
  ├── FSG: the code of FSG
      ├──FSG/Defects4J-Multifault: the code of generating Failure Semantic Graphs for a Java programs in Defects4J-Multifault
@@ -20,7 +20,7 @@ Here we list the descriptions of the folders.
 * Conda
   * install conda: Please refer to the [conda official website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
   * Create a new conda environment:
-      * if you are running with GPU: 
+      * if you are running with GPU:
         ```
         conda env create -f environment-gpu.yml
         conda activate GREClue
@@ -50,23 +50,23 @@ Here we list the descriptions of the folders.
   
   * SIR data contains four C projects from [SIR](https://sir.csc.ncsu.edu/portal/index.php): *flex*, *grep*, *gzip*, and *sed*. Then, faulty versions with 1-bug, 2-bug, 3-bug, 4-bug, and 5-bug were created based on a mutation strategy. The mutation strategy refers to an existing tool [yisongy/mutate.py](https://github.com/yisongy/mutate.py) (This is a simple script to perform mutation testing on c/c++ like programs) to perform mutation.
 
-## Experiment
+## A Guide to Replication
 Our evaluation is performed on an Ubuntu 22.04.5 server equipped with two RTX A6000 GPUs.
 
 ### RQ1 Parameter Analysis
 We studied the impact of different selection ranges of the suspiciousness ranking list on the results.
 
-(1) We first obtain the suspiciousness ranking lists:
+(1) We first obtain the suspiciousness ranking lists using the fault localization technique Dstar.
 
-  * We use tool Gzoltar to obtain the suspiciousness ranking list of Java code in Defects4J-Multifault.
+  * For Java code in Defects4J-Multifault,  we use the tool Gzoltar to obtain the suspiciousness ranking list.
     
       Please refer to the [tool link](https://github.com/Instein98/D4jOchiai) for specific operations. 
       
-  * We use tools Gcov and STImpL to obtain the suspiciousness ranking list of C code in SIR.
+  * For C code in SIR,  we first use the tool Gcov to obtain the coverage information and then implement the fault location formula Dstar to obtain the suspiciousness ranking list. 
     
       Please refer to the [tool link](https://sir.csc.ncsu.edu/content/c-overall.php) for specific operations.
     
-(2) We select different ranges of content from the suspiciousness ranking list to feed the model and observe the model results.
+(2) We select different ranges of content from the suspiciousness ranking list to feed the model and observe the model results:
   ```
   python range.py /path/to/dir --head ranges_of_content --out /path/to/outdir
   ```
@@ -86,11 +86,11 @@ python /FSG/SIR/step2.py   --project /path/of/java/projects   --locs /path/of/su
 python /FSG/SIR/step3.py   --in_dir /path/to/lines_in --out_dir /path/to/flows_out
 python /FSG/SIR/step4.py   --method_graph /path/to/method_graph.txt   --codeline_flow /path/to/codeline_flow.txt   --var_dir /path/to/var_dir   --testfile /path/to/testcase.txt   --out /path/to/merged.txt
  ```
-Based on the obtained FSG, we train the entropy-based clustering model.
+Based on the obtained FSG, we train the entropy-based clustering model:
   ```
   python Entropy_based_clustering/GREClue_code.py
   ```
-After obtaining 30 randomly split results, we used the *mannwhitneyu()* method in the *stats* package to perform the Mann-Whitney-Wilcoxon test and the *rank_compare_2indep()* method in the *nonparametric* package to perform the A-test.
+After obtaining 30 randomly split results, we used the *mannwhitneyu()* method in the [*stats* package](https://docs.scipy.org/doc/scipy/reference/stats.html) to perform the Mann-Whitney-Wilcoxon test and the *rank_compare_2indep()* method in the [*nonparametric* package](https://www.statsmodels.org/stable/nonparametric.html#module-statsmodels.nonparametric) to perform the A-test.
 ### RQ3 Impact Analysis
 In the ablation experiment, we start with the full approach, then remove specific parts separately and observe the results after removal.
 * (1)GREClue-Suspicion_List: We replace GREClue with GREClue-Suspicion_List, which only inputs the sequence features of suspiciousness ranking lists into the entropy-based deep clustering model.
@@ -122,18 +122,18 @@ def build_items_linear(seq_lists: List[List[str]], graphs: List[Dict[str, Any]],
         })
     return items
   ```
-* (2)GREClue-K-medoids: We replace GREClue with GREClue-K-medoids, which first predicts the number of clusters using the data point density estimation method and then performs clustering using K-medoids.
+* (2)GREClue-K-medoids: We replace GREClue with GREClue-K-medoids, which first predicts the number of clusters using the data point density estimation method and then performs clustering using K-medoids:
   ```
   python K-medoids/pipeline.py --data_dir data --k 3 --model bigcode/starcoder2-3b --ra 1.0 --rb 1.5
   ```
-* (3)GREClue-RMALL: We replace GREClue with GREClue-RMALL, which removes FSG and entropy-based deep clustering method, and uses K-medoids for clustering.
+* (3)GREClue-RMALL: We replace GREClue with GREClue-RMALL, which removes FSG and entropy-based deep clustering method, and uses K-medoids for clustering:
   ```
   Delete lines 53-57 and 66-68 in /K-medoids/pipeline.py and replace line 69 -> z=s_vec
   ```
 ### RQ4 Parallel Debugging Effectiveness
 We simulate the parallel debugging process based on the results of the failure indexing approaches.
 
-(1) cluster the failing tests according to the results of the failure indexing approaches.
+(1) cluster the failing tests according to the results of the failure indexing approaches:
   ```
   python Entropy_based_clustering/GREClue_code.py
   ```
@@ -141,7 +141,7 @@ We simulate the parallel debugging process based on the results of the failure i
 
 (3) generate a corresponding suspiciousness ranking list for each test suite.
 
-(4) fix the faulty code for each suspiciousness ranking list in parallel and calculate the parallel debugging cost
+(4) fix the faulty code for each suspiciousness ranking list in parallel and calculate the parallel debugging cost:
   ```
 python debugging_cost.py   --sus sus.csv   --label label.csv
   ```
