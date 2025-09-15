@@ -70,7 +70,7 @@ We studied the impact of different selection ranges of the suspiciousness rankin
   python range.py /path/to/dir --head ranges of content --out /path/to/outdir
   ```
 ### RQ2 Model Effectiveness
-After determining the scope of the suspiciousness ranking list , we need to obtain the FSG of the faulty code.
+After determining the scope of the suspiciousness ranking list, we need to obtain the FSG of the faulty code.
 We generate FSG for Defects4J-Multifault using the following command:
   ```
 python /FSG/Defects4J-Multifault/step1.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv   --txtout /path/of/result.txt
@@ -92,7 +92,7 @@ Based on the obtained FSG, we train the entropy-based clustering model.
 ### RQ3 Impact Analysis
 In the ablation experiment, four submodules are gradually deleted: (1) GREClue-Suspicion_List, (2) GREClue-K-medoids, and (3) GREClue-RMALL.
 * (1)GREClue-Suspicion_List: We replace GREClue with GREClue-Suspicion_List, which only inputs the sequence features of suspiciousness ranking lists into the entropy-based deep clustering model.
-  Please replace the build_items_from_raw method in Entropy-Based cluster/GREClue_code.py with the following:
+  Please replace the "build_items_from_raw" method in "Entropy-Based cluster/GREClue_code.py" with the following:
 ```
 def build_items_linear(seq_lists: List[List[str]], graphs: List[Dict[str, Any]],labels: List[int],sep: str = " [SEP] ") -> List[Dict[str, Any]]:
     assert len(seq_lists) == len(graphs) == len(labels), "length mismatch among inputs"
