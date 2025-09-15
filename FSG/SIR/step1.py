@@ -1,20 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-"""
-Tree-Sitter(C) + 怀疑列表（locs）：
-- 解析 locs（org.xxx$File#Func():line;sus）
-- 全项目构建“函数 -> 直接被调函数”图
-- 以可疑方法为种子做向外 BFS（多跳），仅输出可达子图
-- 只输出两段：
-  methodnodes:
-    N method: {content: <相对路径去扩展名>#<函数名>}
-  edge:
-    u->v
-
-依赖：
-  pip install tree_sitter tree_sitter_languages
-"""
 
 from __future__ import annotations
 import argparse
@@ -24,8 +7,6 @@ from typing import Dict, Set, List, Tuple
 from collections import defaultdict, deque
 from tree_sitter import Parser
 
-# ----------------- 解析 locs -----------------
-# 例如：org.apache.commons.lang3.time$FormatCache#FormatCache():41;1.0
 LOC_RE = re.compile(
     r"""
     ^
@@ -55,13 +36,12 @@ class Susp:
 
     @property
     def rel_hint(self) -> Path:
-        # 期望目录 = pkg 替换 '.' 为目录；文件 = filebase.c
         return Path(*self.pkg.split(".")) / f"{self.filebase}.c"
 
 def parse_loc_line(s: str) -> Susp:
     m = LOC_RE.match(s.strip())
     if not m:
-        raise ValueError(f"非法位置串：{s}")
+        raise ValueError(f"error：{s}")
     return Susp(
         raw=s.strip(),
         pkg=m.group("pkg"),
@@ -71,13 +51,13 @@ def parse_loc_line(s: str) -> Susp:
         sus=float(m.group("sus")),
     )
 
-# ----------------- Tree-Sitter 函数/调用抽取 -----------------
+
 def load_c_language():
     try:
         from tree_sitter_languages import get_language
         return get_language("c")
     except Exception:
-        raise RuntimeError("请先安装依赖：pip install tree_sitter tree_sitter_languages")
+        raise RuntimeError("pip install tree_sitter tree_sitter_languages")
 
 def node_text(src: bytes, node) -> str:
     return src[node.start_byte:node.end_byte].decode("utf-8", errors="ignore").strip()
@@ -88,10 +68,7 @@ def walk(node):
         yield from walk(node.named_child(i))
 
 def extract_functions_and_calls_c(src_path: Path, parser: Parser) -> Dict[str, Tuple[int,int,Set[str]]]:
-    """
-    返回：func_name -> (start_line, end_line, direct_callees)
-    - 仅抽取 call_expression 的标识符调用（identifier(...)）
-    """
+
     source = src_path.read_bytes()
     tree = parser.parse(source)
     root = tree.root_node
@@ -101,7 +78,6 @@ def extract_functions_and_calls_c(src_path: Path, parser: Parser) -> Dict[str, T
         if defn.type != "function_definition":
             continue
 
-        # 函数名（在 function_declarator/declarator 的 identifier）
         func_name = None
         decl = None
         for i in range(defn.named_child_count):
@@ -121,7 +97,7 @@ def extract_functions_and_calls_c(src_path: Path, parser: Parser) -> Dict[str, T
         if not func_name:
             continue
 
-        # 函数体范围
+
         body = None
         for i in range(defn.named_child_count):
             ch = defn.named_child(i)
@@ -134,7 +110,7 @@ def extract_functions_and_calls_c(src_path: Path, parser: Parser) -> Dict[str, T
         start_line = body.start_point[0] + 1
         end_line   = body.end_point[0] + 1
 
-        # 抓直接调用
+
         callees: Set[str] = set()
         for inner in walk(body):
             if inner.type == "call_expression" and inner.named_child_count > 0:
@@ -148,7 +124,7 @@ def extract_functions_and_calls_c(src_path: Path, parser: Parser) -> Dict[str, T
 
     return out
 
-# ----------------- 项目索引与图构建 -----------------
+
 def read_lines(p: Path) -> List[str]:
     try:
         return p.read_text(encoding="utf-8", errors="ignore").splitlines()
@@ -171,11 +147,7 @@ def find_c_file(project_root: Path, rel_hint: Path, filebase: str) -> Path | Non
     return None
 
 def index_project(project_root: Path) -> Tuple[Dict[str, Dict[str, Tuple[int,int,Set[str]]]], Dict[str,str]]:
-    """
-    扫描 *.c，返回：
-      file_to_funcs: relpath -> { func: (start, end, callees) }
-      func_to_fullname: func -> "<rel_no_ext>#func"（首次定义）
-    """
+
     LANG_C = load_c_language()
     parser = Parser()
     parser.set_language(LANG_C)
@@ -204,7 +176,7 @@ def build_direct_graph(file_to_funcs: Dict[str, Dict[str, Tuple[int,int,Set[str]
             g[fn].update(callees)
     return g
 
-# ----------------- 由怀疑列表确定种子方法 -----------------
+
 def locate_owner_func_for_line(cfile: Path, target_line: int, fmap: Dict[str, Tuple[int,int,Set[str]]]) -> str | None:
     for fn, (s, e, _c) in fmap.items():
         if s <= target_line <= e:
@@ -215,27 +187,27 @@ def seeds_from_locs(project_root: Path,
                     file_to_funcs: Dict[str, Dict[str, Tuple[int,int,Set[str]]]],
                     suspicious: List[Susp]) -> Set[str]:
     seeds: Set[str] = set()
-    # 建立 rel -> fmap 的索引
+
     for sp in suspicious:
         cpath = find_c_file(project_root, sp.rel_hint, sp.filebase)
         if not cpath:
-            # 找不到文件，退回到显式函数名
+
             seeds.add(sp.func)
             continue
         rel = str(cpath.relative_to(project_root))
         fmap = file_to_funcs.get(rel)
         if not fmap:
-            # 该文件可能语法异常而被跳过，退回函数名
+
             seeds.add(sp.func)
             continue
         owner = locate_owner_func_for_line(cpath, sp.line, fmap)
         seeds.add(owner if owner else sp.func)
     return seeds
 
-# ----------------- 只输出可达子图（从种子出发） -----------------
+
 def reachable_subgraph_from(seeds: Set[str],
                             g: Dict[str, Set[str]]) -> Set[str]:
-    """从种子做 BFS，得到所有可达函数名（含种子本身）"""
+
     reach: Set[str] = set()
     q = deque(seeds)
     reach.update(seeds)
@@ -247,35 +219,34 @@ def reachable_subgraph_from(seeds: Set[str],
                 q.append(v)
     return reach
 
-# ----------------- 主程序 -----------------
+
 def main():
-    ap = argparse.ArgumentParser(description="Tree-Sitter(C) 调用图（带怀疑列表，输出 methodnodes/edge）")
-    ap.add_argument("--project", required=True, type=Path, help="C 项目根目录")
-    ap.add_argument("--locs", required=True, type=Path, help="怀疑位置串文件，每行 org.xxx$File#Func():line;sus")
-    ap.add_argument("--out", required=True, type=Path, help="输出 txt")
+    ap = argparse.ArgumentParser(description="Static Analysis")
+    ap.add_argument("--project", required=True, type=Path)
+    ap.add_argument("--locs", required=True, type=Path)
+    ap.add_argument("--out", required=True, type=Path)
     args = ap.parse_args()
 
     project_root = args.project.resolve()
     loc_lines = [ln.strip() for ln in args.locs.read_text(encoding="utf-8").splitlines() if ln.strip()]
     suspicious = [parse_loc_line(s) for s in loc_lines]
 
-    # 1) 项目索引 & 直接调用图
+
     file_to_funcs, func_to_fullname = index_project(project_root)
     g = build_direct_graph(file_to_funcs)
 
-    # 2) 由怀疑列表得到“种子函数”
+
     seeds = seeds_from_locs(project_root, file_to_funcs, suspicious)
 
-    # 3) 只保留从种子出发可达的函数（子图）
+
     keep_funcs = reachable_subgraph_from(seeds, g)
 
-    # 4) 构建 fullname，并统一编号
+
     fullname_to_id: Dict[str, int] = {}
     nodes_out: List[str] = []
     next_id = 1
 
-    # 我们需要稳定顺序：按文件、函数名排序，但只收录 keep_funcs 中存在且在项目中有定义的位置
-    # 建立 “函数名 -> 其定义文件相对路径（首次）” 的反向帮助（已在 func_to_fullname 中）
+
     for rel in sorted(file_to_funcs.keys()):
         base_no_ext = str(Path(rel).with_suffix(""))
         for fn in sorted(file_to_funcs[rel].keys()):
@@ -287,12 +258,11 @@ def main():
                 nodes_out.append(f"{next_id} method: {{content: {fullname}}}")
                 next_id += 1
 
-    # 5) 边：只输出子图中（两端函数都在 keep_funcs）的直接调用边
+
     edges_out: List[str] = []
 
-    # 帮助把“函数名”映射到 fullname 与 id
     def fn_to_full(fn: str) -> str | None:
-        # 若该函数在 keep 中且在项目中出现过
+
         return func_to_fullname.get(fn)
 
     def full_to_id(full: str) -> int | None:
@@ -317,7 +287,7 @@ def main():
                 if dst_id:
                     edges_out.append(f"{src_id}->{dst_id}")
 
-    # 6) 写出
+
     out_lines: List[str] = []
     out_lines.append("methodnodes:")
     out_lines.extend(nodes_out)
@@ -326,7 +296,7 @@ def main():
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
-    print(f"已写入：{args.out}")
+    print(f"finish：{args.out}")
 
 if __name__ == "__main__":
     main()
