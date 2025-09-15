@@ -1,5 +1,5 @@
 # GREClue
-A PyTorch Implementation of paper "GREClue: Failure Indexing with Graph-based Failure Representation and Entropy-based Deep Clustering". 
+A PyTorch Implementation of FSE submission "GREClue: Failure Indexing with Graph-based Failure Representation and Entropy-based Deep Clustering". 
 
 ## Introduction
 Failure indexing aims to group multiple failures according to their root causes and is an essential step in parallel debugging. Failure indexing consists mainly of two steps: failure representation and failure clustering. While many research efforts have been devoted to these two steps, serious issues still exist. For failure representation, existing works use coverage or program memory information, which unfortunately can not capture deep failure semantic. For failure clustering, advanced failure indexing methods use clustering algorithms with preset cluster centers, but this kind of clustering algorithm can handle circular clusters well but performs poorly when handling clusters of other shapes. To address these issues, this paper propose GREClue, a novel failure indexing approach with Graph-based failure Representation and Entropy-based deep Clustering. GREClue overcomes the issues in order. For failure representation, GREClue designs the failure semantic graph (FSG), a new graph representation that effectively contains semantic information and runtime information of failures.
@@ -25,7 +25,7 @@ Here we list the descriptions of the folders.
         conda env create -f environment-gpu.yml
         conda activate GREClue
         ```
-        Dependencies include support for CUDA_11.4. If you are using a different CUDA version update the dependencies accordingly.
+        Dependencies include support for CUDA_11.4. If you are using a different CUDA version, update the dependencies accordingly.
       * if you are running with CPU:   
         ```
         conda env create -f environment-cpu.yml
@@ -48,7 +48,7 @@ Here we list the descriptions of the folders.
     Please refer to the [tool link](https://github.com/coinse/Defects4J-multifault) for specific operations.
 * SIR data is obtained from https://github.com/SURE-Repo/SURE/tree/main/Faulty_Program/SIR
   
-  * SIR data contains four C projects from [SIR](https://sir.csc.ncsu.edu/portal/index.php): *flex*, *grep*, *gzip*, and *sed*. Then, faulty versions with 1-bug, 2-bug, 3-bug, 4-bug, and 5-bug were created based on a mutation strategy. The mutation strategy refers to an existing tool [yisongy/mutate.py](https://github.com/yisongy/mutate.py)(This is a simple script to perform mutation testing on c/c++ like programs) to perform mutation.
+  * SIR data contains four C projects from [SIR](https://sir.csc.ncsu.edu/portal/index.php): *flex*, *grep*, *gzip*, and *sed*. Then, faulty versions with 1-bug, 2-bug, 3-bug, 4-bug, and 5-bug were created based on a mutation strategy. The mutation strategy refers to an existing tool [yisongy/mutate.py](https://github.com/yisongy/mutate.py) (This is a simple script to perform mutation testing on c/c++ like programs) to perform mutation.
 
 ## Experiment
 Our evaluation is performed on an Ubuntu 22.04.5 server equipped with two RTX A6000 GPUs.
@@ -58,11 +58,11 @@ We studied the impact of different selection ranges of the suspiciousness rankin
 
 (1) We first obtain the suspiciousness ranking lists:
 
-  * We use tools such as gzoltaragent.jar and gzoltarcli.jar to obtain the suspiciousness ranking list of Java code in Defects4J-Multifault.
+  * We use tool Gzoltar to obtain the suspiciousness ranking list of Java code in Defects4J-Multifault.
     
       Please refer to the [tool link](https://github.com/Instein98/D4jOchiai) for specific operations. 
       
-  * We use tools such as gcov and STImpL to obtain the suspiciousness ranking list of C code in SIR.
+  * We use tools Gcov and STImpL to obtain the suspiciousness ranking list of C code in SIR.
     
       Please refer to the [tool link](https://sir.csc.ncsu.edu/content/c-overall.php) for specific operations.
     
