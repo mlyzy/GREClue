@@ -12,7 +12,7 @@ Our code is written based on the Peft package. Here we only describe the files r
 ```
  ├── Dataset: data used to train and test
  ├── FSG: the code of FSG
-     ├──FSG/Defects4j: the code of generating Failure Semantic Graphs for a Java programs in Defects4j
+     ├──FSG/Defects4J-Multifault: the code of generating Failure Semantic Graphs for a Java programs in Defects4J-Multifault
      ├──FSG/SIR: the code of generating Failure Semantic Graphs for a C programs in SIR
  ├── Entropy-based cluster: the code of Entropy-based cluster
  ├── K-medoids: the code of K-medoids
@@ -57,25 +57,25 @@ Our evaluation is performed on an Ubuntu 22.04.5 server equipped with two RTX A6
 ### RQ1 Parameter Analysis
 We studied the impact of different selection ranges of the suspiciousness ranking list on the results.
 
-(1) We first obtain a list of fault code suspicions:
+(1) We first obtain the suspiciousness ranking lists:
 
-  * We use tools such as gzoltaragent.jar and gzoltarcli.jar to obtain the suspicion list of Java code in Defects4J.
+  * We use tools such as gzoltaragent.jar and gzoltarcli.jar to obtain the suspiciousness ranking list of Java code in Defects4J-Multifault.
       For specific reference: [https://github.com/Instein98/D4jOchiai]
       
-  * We use tools such as gcov and STImpL to obtain the suspicion list of C code in SIR.
+  * We use tools such as gcov and STImpL to obtain the suspiciousness ranking list of C code in SIR.
       For specific reference: [https://sir.csc.ncsu.edu/content/c-overall.php]
       
-(2) We select different ranges of content from the suspicious list to feed the model and observe the model results.
+(2) We select different ranges of content from the suspiciousness ranking list to feed the model and observe the model results.
   ```
   python range.py /path/to/dir --head ranges of content --out /path/to/outdir
   ```
 ### RQ2 Model Effectiveness
-After determining the scope of the suspect list, we need to obtain the FSG of the faulty code.
+After determining the scope of the suspiciousness ranking list , we need to obtain the FSG of the faulty code.
   ```
-python /FSG/Defects4j/step1.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv   --txtout /path/of/result.txt
-python /FSG/Defects4j/step2.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv  --txtout /path/of/result.txt
+python /FSG/Defects4J-Multifault/step1.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv   --txtout /path/of/result.txt
+python /FSG/Defects4J-Multifault/step2.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv  --txtout /path/of/result.txt
 javac FSG/semanticmodel/Activator.java
-python /FSG/Defects4j/step4.py   --method_graph /path/to/method_graph.txt   --codeline_flow /path/to/codeline_flow.txt   --var_dir /path/to/var_dir   --testfile /path/to/testcase.txt   --out /path/to/merged.txt
+python /FSG/Defects4J-Multifault/step4.py   --method_graph /path/to/method_graph.txt   --codeline_flow /path/to/codeline_flow.txt   --var_dir /path/to/var_dir   --testfile /path/to/testcase.txt   --out /path/to/merged.txt
   ```
   ```
 python /FSG/SIR/step1.py   --project /path/of/java/projects   --locs /path/of/suspiciousnesslist.csv   --txtout /path/of/result.txt
