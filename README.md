@@ -8,7 +8,7 @@ Based on the FSG, GREClue further consists of an entropy-based deep clustering c
 <div align=center><img src="fig3.png" width = 50% ></div>
 
 ## Folder Structure
-Here, we list the functions of folders.
+Here we list the descriptions of the folders.
 ```
  ├── Dataset: data used to train and test
  ├── FSG: the code of FSG
@@ -19,7 +19,7 @@ Here, we list the functions of folders.
 ```
 ## Requirements
 * Conda
-  * install conda: [https://conda.io/projects/conda/en/latest/user-guide/install/index.html](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
+  * install conda: Please refer to the [conda official website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
   * Create a new conda environment:
       * if you are running with GPU: 
         ```
@@ -46,7 +46,7 @@ Here, we list the functions of folders.
 
     `"Searching for Multi-Fault Programs in Defects4J", Gabin An, Juyeon Yoon, Shin Yoo, SSBSE 2021`
     
-    The code link is [https://github.com/coinse/Defects4J-multifault]
+    Please refer to the [tool link](https://github.com/coinse/Defects4J-multifault) for specific operations.
 * SIR data be obtained from https://github.com/SURE-Repo/SURE/tree/main/Faulty_Program/SIR
   
   * SIR data contains four C projects from [SIR](https://sir.csc.ncsu.edu/portal/index.php): *flex*, *grep*, *gzip*, and *sed*. Then, faulty versions with 1-bug, 2-bug, 3-bug, 4-bug, and 5-bug were created based on a mutation strategy. The mutation strategy refers to an existing tool [yisongy/mutate.py](https://github.com/yisongy/mutate.py)(This is a simple script to perform mutation testing on c/c++ like programs) to perform mutation.
@@ -60,11 +60,13 @@ We studied the impact of different selection ranges of the suspiciousness rankin
 (1) We first obtain the suspiciousness ranking lists:
 
   * We use tools such as gzoltaragent.jar and gzoltarcli.jar to obtain the suspiciousness ranking list of Java code in Defects4J-Multifault.
-      For specific reference: https://github.com/Instein98/D4jOchiai
+    
+      Please refer to the [tool link](https://github.com/Instein98/D4jOchiai) for specific operations. 
       
   * We use tools such as gcov and STImpL to obtain the suspiciousness ranking list of C code in SIR.
-      For specific reference: https://sir.csc.ncsu.edu/content/c-overall.php
-      
+    
+      Please refer to the [tool link](https://sir.csc.ncsu.edu/content/c-overall.php) for specific operations.
+    
 (2) We select different ranges of content from the suspiciousness ranking list to feed the model and observe the model results.
   ```
   python range.py /path/to/dir --head ranges_of_content --out /path/to/outdir
@@ -89,9 +91,9 @@ Based on the obtained FSG, we train the entropy-based clustering model.
   ```
   python Entropy_based_clustering/GREClue_code.py
   ```
-
+After obtaining 30 randomly split results, we used the *mannwhitneyu()* method in the *stats* package to perform the Mann-Whitney-Wilcoxon test and the *rank_compare_2indep()* method in the *nonparametric* package to perform the A-test.
 ### RQ3 Impact Analysis
-In the ablation experiment, three submodules are gradually deleted: (1) GREClue-Suspicion_List, (2) GREClue-K-medoids, and (3) GREClue-RMALL.
+In the ablation experiment, we start with the full approach, then remove specific parts separately and observe the results after removal.
 * (1)GREClue-Suspicion_List: We replace GREClue with GREClue-Suspicion_List, which only inputs the sequence features of suspiciousness ranking lists into the entropy-based deep clustering model.
   Please replace the "build_items_from_raw" method in "Entropy-Based cluster/GREClue_code.py" with the following:
 ```
