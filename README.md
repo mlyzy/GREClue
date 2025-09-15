@@ -130,6 +130,7 @@ def build_items_linear(seq_lists: List[List[str]], graphs: List[Dict[str, Any]],
   ```
 ### RQ4 Parallel Debugging Effectiveness
 We simulate the parallel debugging process based on the results of the failure indexing approaches.
+
 (1) cluster the failing tests according to the results of the failure indexing approaches.
   ```
   python Entropy_based_cluster/GREClue_code.py
