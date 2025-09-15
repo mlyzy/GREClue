@@ -46,7 +46,7 @@ Here we list the descriptions of the folders.
     `"Searching for Multi-Fault Programs in Defects4J", Gabin An, Juyeon Yoon, Shin Yoo, SSBSE 2021`
     
     Please refer to the [tool link](https://github.com/coinse/Defects4J-multifault) for specific operations.
-* SIR data be obtained from https://github.com/SURE-Repo/SURE/tree/main/Faulty_Program/SIR
+* SIR data is obtained from https://github.com/SURE-Repo/SURE/tree/main/Faulty_Program/SIR
   
   * SIR data contains four C projects from [SIR](https://sir.csc.ncsu.edu/portal/index.php): *flex*, *grep*, *gzip*, and *sed*. Then, faulty versions with 1-bug, 2-bug, 3-bug, 4-bug, and 5-bug were created based on a mutation strategy. The mutation strategy refers to an existing tool [yisongy/mutate.py](https://github.com/yisongy/mutate.py)(This is a simple script to perform mutation testing on c/c++ like programs) to perform mutation.
 
